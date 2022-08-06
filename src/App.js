@@ -1,50 +1,42 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
+import './App.css';
+import { useState } from "react";
+import Search from "./components/search/search"
+import CurrentWeather from './components/current-weather/current-weather';
+import Forecast from './components/forecast/forecast';
+import { WEATHER_API_URL, WEATHER_API_KEY} from './api'
 
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
+function App() {
+
+  const [currentWeather, setCurrentWeather] = useState(null)
+  const [forecastWeather, setForecastWeather] = useState(null)
+
+  const handleOnSearchChange = (searchData) =>{
+    const [latitude, longitude] = searchData.value.split(" ")
+
+    const currentWeatherFetch = fetch(`${WEATHER_API_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`);
+    const forecastWeatherFetch = fetch(`${WEATHER_API_URL}/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`);
+
+    Promise.all([currentWeatherFetch, forecastWeatherFetch])
+      .then(async (response)=>{
+        const weatherResponse = await response[0].json();
+        const forecastResponse = await response[1].json();
+
+        setCurrentWeather({city: searchData.label, ...weatherResponse})
+        setForecastWeather({city: searchData.label, ...forecastResponse})
+      })
+      .catch((err) => console.log(err))
   }
 
-  handleClick = api => e => {
-    e.preventDefault()
+  console.log(currentWeather)
+  console.log(forecastWeather)
 
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
-
-  render() {
-    const { loading, msg } = this.state
-
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
+  return (
+    <div className="container">
+      <Search onSearchChange={handleOnSearchChange} />
+      {currentWeather && <CurrentWeather data={currentWeather} />}
+      {forecastWeather && <Forecast data={forecastWeather}/>}
+    </div>
+  );
 }
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
-      </div>
-    )
-  }
-}
-
-export default App
+export default App;
