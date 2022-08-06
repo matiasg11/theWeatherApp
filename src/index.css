@@ -3,7 +3,7 @@ body {
   font-family: "Roboto", Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: no-repeat cover url("../public/back.jpg");
+  background: no-repeat  url("../public/back.jpg");
   /*background-color: #2524ff;*/
   
 }
