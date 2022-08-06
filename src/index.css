@@ -3,8 +3,9 @@ body {
   font-family: "Roboto", Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: url("../public/back.jpg");
   background-color: #2524ff;
-  background: url("../public/back.jpg")
+  
 }
 
 code {
